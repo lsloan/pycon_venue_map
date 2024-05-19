@@ -3,20 +3,17 @@ from io import BytesIO
 import pymupdf  # pip install PyMuPDF
 import requests  # pip install requests
 
-online = True
+online = False
 
-if online:
-    filestream = requests.get(
+if online is True:
+    pdfStream = requests.get(
         'https://pycon-assets.s3.amazonaws.com/2024/media/'
         'documents/DLCC-Floorplan-Marked_up_PyCon_US_2024.pdf').content
 else:
-    with open('DLCC-Floorplan-Marked_up_PyCon_US_2024.pdf', 'rb') as fh:
-        filestream = BytesIO(fh.read())
+    pdfStream = BytesIO(
+        open('DLCC-Floorplan-Marked_up_PyCon_US_2024.pdf', 'rb').read())
 
-doc = pymupdf.Document(stream=filestream)
-
-for (pageNumber, page) in enumerate(doc.pages()):
-    imageFilename = f'page-{pageNumber + 1}.png'
-    print(f'Converting page {pageNumber + 1} to "{(imageFilename)}"…')
-    pixmap = page.get_pixmap(dpi=300)
-    pixmap.save(imageFilename)
+for (n, page) in enumerate(pymupdf.Document(stream=pdfStream).pages(), 1):
+    imageFilename = f'page-{n}.png'
+    print(f'Converting page {n} to "{imageFilename}"…')
+    page.get_pixmap(dpi=300).save(imageFilename)
