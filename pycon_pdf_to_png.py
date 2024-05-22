@@ -1,17 +1,13 @@
-from io import BytesIO
+import urllib.request
 
 import pymupdf  # pip install PyMuPDF
-import requests  # pip install requests
 
-online = False
+url = ('https://pycon-assets.s3.amazonaws.com/2024/media/'
+       'documents/DLCC-Floorplan-Marked_up_PyCon_US_2024.pdf')
+# url = 'file:DLCC-Floorplan-Marked_up_PyCon_US_2024.pdf'
 
-if online is True:
-    pdfStream = requests.get(
-        'https://pycon-assets.s3.amazonaws.com/2024/media/'
-        'documents/DLCC-Floorplan-Marked_up_PyCon_US_2024.pdf').content
-else:
-    pdfStream = BytesIO(
-        open('DLCC-Floorplan-Marked_up_PyCon_US_2024.pdf', 'rb').read())
+with urllib.request.urlopen(url) as response:
+    pdfStream = response.read()
 
 for (n, page) in enumerate(pymupdf.Document(stream=pdfStream).pages(), 1):
     imageFilename = f'page-{n}.png'
